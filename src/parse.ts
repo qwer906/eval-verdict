@@ -9,8 +9,9 @@ export const fail = (issues: readonly string[]): Parsed<never> => ({ ok: false, 
 const VERDICTS: readonly string[] = ["PASS", "FAIL", "ERROR"] satisfies Verdict[];
 const isVerdict = (v: unknown): v is Verdict => typeof v === "string" && VERDICTS.includes(v);
 
-const RULE_KEYS = ["pass", "minPassingTrials", "minTrials"];
-const CONFIG_KEYS = [...RULE_KEYS, "model", "minCases", "cases", "guards"];
+export const RULE_KEYS = ["pass", "minPassingTrials", "minTrials"];
+/** `$schema` 는 에디터 자동완성용이라 판정에 쓰지 않는다. */
+export const CONFIG_KEYS = [...RULE_KEYS, "$schema", "model", "minCases", "cases", "guards"];
 
 /**
  * 설정 파일을 검사한다. 문제는 처음 하나에서 멈추지 않고 전부 모아 돌려준다.

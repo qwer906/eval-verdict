@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/qwer906/eval-verdict/main/schema/config.schema.json",
+  "title": "eval-verdict config",
+  "description": "Thresholds for eval-verdict. Unknown keys are errors: a typo must not silently weaken the gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pass", "minPassingTrials", "minTrials"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Model the thresholds were set for. A report from another model is ERROR."
+    },
+    "pass": { "$ref": "#/$defs/range", "description": "Range one trial must fall in to pass. Both ends inclusive." },
+    "minPassingTrials": { "$ref": "#/$defs/count", "description": "k: passing trials a case needs." },
+    "minTrials": { "$ref": "#/$defs/count", "description": "n: measured (non-null) trials needed to judge at all. Fewer is ERROR." },
+    "minCases": { "$ref": "#/$defs/count", "default": 1, "description": "Cases the report must contain." },
+    "cases": {
+      "type": "object",
+      "description": "Per-case overrides. Every case named here must be in the report.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pass": { "$ref": "#/$defs/range" },
+          "minPassingTrials": { "$ref": "#/$defs/count" },
+          "minTrials": { "$ref": "#/$defs/count" }
+        }
+      }
+    },
+    "guards": {
+      "type": "object",
+      "description": "Ranges for report.samples. Missing, null, or out of range is ERROR.",
+      "additionalProperties": { "$ref": "#/$defs/range" }
+    }
+  },
+  "$defs": {
+    "count": { "type": "integer", "minimum": 1 },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    }
+  }
+}

@@ -26,7 +26,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "schema"
   ],
   "engines": {
     "node": ">=22"

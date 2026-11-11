@@ -1,14 +1,28 @@
 {
+  "$schema": "../schema/config.schema.json",
   "model": "grader-model-a",
-  "pass": { "min": 80 },
+  "pass": {
+    "min": 80
+  },
   "minPassingTrials": 1,
   "minTrials": 2,
   "minCases": 3,
   "cases": {
-    "false-correct-pct": { "pass": { "max": 10 } },
-    "unrelated-false-correct": { "pass": { "max": 1 }, "minTrials": 1 }
+    "false-correct-pct": {
+      "pass": {
+        "max": 10
+      }
+    },
+    "unrelated-false-correct": {
+      "pass": {
+        "max": 1
+      },
+      "minTrials": 1
+    }
   },
   "guards": {
-    "graded-points": { "min": 200 }
+    "graded-points": {
+      "min": 200
+    }
   }
 }
