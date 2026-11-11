@@ -19,3 +19,39 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run ci
+
+  action:
+    # action.yml 을 이 레포의 예시 파일로 실제 실행한다.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - id: pass
+        uses: ./
+        with:
+          reports: examples/reports/report.json
+          config: examples/config.json
+      - id: thin
+        uses: ./
+        continue-on-error: true
+        with:
+          reports: examples/reports/report-thin.json
+          config: examples/config.json
+      - id: replay
+        uses: ./
+        continue-on-error: true
+        with:
+          command: replay
+          reports: examples/reports/*.json
+          config: examples/config.json
+      - name: Check outputs
+        env:
+          PASS: ${{ steps.pass.outputs.verdict }}
+          THIN: ${{ steps.thin.outputs.verdict }}
+          THIN_OUTCOME: ${{ steps.thin.outcome }}
+          REPLAY: ${{ steps.replay.outputs.verdict }}
+        run: |
+          echo "pass=$PASS thin=$THIN ($THIN_OUTCOME) replay=$REPLAY"
+          test "$PASS" = PASS
+          test "$THIN" = ERROR
+          test "$THIN_OUTCOME" = failure
+          test "$REPLAY" = CHANGED

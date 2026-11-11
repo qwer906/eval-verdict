@@ -191,7 +191,9 @@ src/
 test/             node:test (CLI는 run(argv, io)를 직접 불러 exit code까지 확인)
 examples/         설정 하나, 결과 둘(PASS·ERROR)
 scripts/smoke.mjs 빌드된 CLI를 예시 파일로 실제 실행해 exit code 확인
-docs/reference.md 설정 키, 결과 키, exit code, API
+docs/reference.md 설정 키, 결과 키, exit code, Action, API
+schema/           설정 JSON Schema (파서와 키가 같은지 테스트로 확인)
+action.yml        GitHub Action (composite)
 .github/workflows/ci.yml
 README.md · AGENTS.md · LICENSE
 ```

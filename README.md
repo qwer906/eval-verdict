@@ -11,6 +11,7 @@
 - **못 잰 것은 FAIL이 아니라 ERROR.** run이 무너졌거나 표본이 모자라면 exit 2를 냅니다. 회귀(exit 1)와 인프라 고장을 섞지 않습니다.
 - **`replay`로 임계 변경 미리 보기.** 과거 결과에 새 설정을 적용해, 뒤집히는 판정을 먼저 보여 줍니다.
 - **실제 게이트와 같은 판정.** 팀 프로젝트 게이트 기록 21건을 다시 판정해 21건 모두 같은 결과가 나왔습니다. → [검증](#실제-게이트로-검증)
+- **GitHub Action 한 줄.** `uses: qwer906/eval-verdict@v0`. 설정 파일은 JSON Schema로 에디터에서 자동완성됩니다.
 - **런타임 의존성 0개, 순수 함수 판정.** `judge()`는 파일, 네트워크, 시계를 건드리지 않습니다.
 
 ## 예시
@@ -78,6 +79,25 @@ npx eval-verdict replay history/*.json   --config gate.config.json   # 0 안 바
 ```
 
 GitHub Actions에서는 같은 판정을 job summary 표로도 남깁니다.
+
+### GitHub Action
+
+```yaml
+- uses: qwer906/eval-verdict@v0
+  id: gate
+  with:
+    reports: eval-out/report.json
+    config: gate.config.json
+# FAIL·ERROR면 step이 실패합니다. 판정은 steps.gate.outputs.verdict
+```
+
+### 에디터 자동완성
+
+설정 파일 맨 위에 스키마를 적으면 키 자동완성과 오타 표시가 됩니다.
+
+```json
+{ "$schema": "./node_modules/eval-verdict/schema/config.schema.json" }
+```
 
 <details>
 <summary>라이브러리로 쓰기</summary>
@@ -148,13 +168,15 @@ flowchart LR
 
 ```bash
 npm ci
-npm run ci   # typecheck → lint → test(38) → build → smoke
+npm run ci   # typecheck → lint → test(41) → build → smoke
 ```
 
 - TypeScript strict에 `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`를 켰습니다.
 - typescript-eslint는 `strictTypeChecked`를 씁니다.
 - 테스트는 `node:test`로 돌립니다.
 - `smoke`는 빌드된 CLI를 예시 파일로 실행해 exit code를 확인합니다.
+- CI는 `action.yml`도 예시 파일로 실제 실행해 PASS·ERROR·replay 출력을 확인합니다.
+- JSON Schema와 파서가 받는 키가 다르면 테스트가 실패합니다.
 
 ## License
 

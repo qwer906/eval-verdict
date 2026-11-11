@@ -5,6 +5,7 @@
 ## CLI
 
 ```bash
+eval-verdict --version
 eval-verdict check  <report.json>     --config <config.json> [--json]
 eval-verdict replay <report.json>...  --config <config.json> [--json]
 ```
@@ -19,6 +20,7 @@ eval-verdict replay <report.json>...  --config <config.json> [--json]
 | `--config <file>` | 필수. 임계는 이 파일에만 둡니다. 임계를 바꾸는 플래그는 없습니다 |
 | `--json` | 판정 객체(`Judgement`, `Replay`)를 JSON으로 출력합니다 |
 | `-h`, `--help` | 도움말 |
+| `-v`, `--version` | 버전 |
 
 - `check`는 환경 변수 `GITHUB_STEP_SUMMARY`가 있으면 같은 판정을 markdown 표로 그 파일에 덧붙입니다.
 - 덧붙이기가 실패해도 판정과 exit code는 바뀌지 않습니다.
@@ -36,6 +38,7 @@ eval-verdict replay <report.json>...  --config <config.json> [--json]
 | `model` | 문자열 | 없음 | 임계를 정한 모델. 결과의 `model`과 다르면 ERROR |
 | `cases` | `{ [id]: { pass?, minPassingTrials?, minTrials? } }` | `{}` | 케이스별 규칙. 여기 적은 케이스는 결과에 반드시 있어야 합니다 |
 | `guards` | `{ [name]: Range }` | 없음 | 결과 `samples`가 들어야 하는 범위 |
+| `$schema` | 문자열 | 없음 | 에디터 자동완성용. 판정에 쓰지 않습니다. 스키마는 [`schema/config.schema.json`](../schema/config.schema.json) |
 
 **`Range`**
 - `{ "min"?: number, "max"?: number }` 형태입니다. 하나 이상 적어야 하고, 양 끝을 포함합니다.
@@ -84,6 +87,31 @@ eval-verdict replay <report.json>...  --config <config.json> [--json]
 | run마다 보고, 모든 run이 나쁠 때만 FAIL | `minPassingTrials: 1`, `minTrials: 2` |
 | 3번 중 2번 PASS (PASS=1, PARTIAL=0.5, FAIL=0) | `pass: { "min": 1 }`, `minPassingTrials: 2`, `minTrials: 3` |
 | 여러 run을 합친 값으로 한 번만 판정 | trial 하나, `minPassingTrials: 1`, `minTrials: 1` |
+
+## GitHub Action
+
+```yaml
+- uses: qwer906/eval-verdict@v0
+  id: gate
+  with:
+    command: check            # 또는 replay
+    reports: eval-out/*.json  # 공백으로 여러 개, glob 가능
+    config: gate.config.json
+```
+
+| 입력 | 기본값 | 설명 |
+|---|---|---|
+| `command` | `check` | `check` 또는 `replay` |
+| `reports` | 필수 | 결과 파일. 공백으로 구분하고 셸이 glob을 펼칩니다 |
+| `config` | 필수 | 설정 파일 |
+| `node-version` | `22` | 도구를 돌릴 Node 버전 (22 이상) |
+
+| 출력 | 값 |
+|---|---|
+| `verdict` | `check`: `PASS`·`FAIL`·`ERROR`, `replay`: `UNCHANGED`·`CHANGED`·`ERROR` |
+
+- exit code가 0이 아니면 step이 실패합니다. 판정만 보고 계속하려면 `continue-on-error: true`를 줍니다.
+- `actions/setup-node`로 Node를 설치하므로, 뒤 step의 Node 버전도 이 값이 됩니다.
 
 ## 라이브러리 API
 

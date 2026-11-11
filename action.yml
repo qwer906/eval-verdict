@@ -1,0 +1,58 @@
+name: eval-verdict
+description: Turn repeated LLM eval results into one merge-blocking verdict (PASS / FAIL / ERROR).
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  command:
+    description: "check (one report) or replay (many reports)"
+    default: check
+  reports:
+    description: "Report file(s), space-separated. Globs are expanded by the shell."
+    required: true
+  config:
+    description: Config file with the thresholds.
+    required: true
+  node-version:
+    description: Node.js version used to run the tool (22 or later).
+    default: "22"
+
+outputs:
+  verdict:
+    description: "check: PASS, FAIL or ERROR. replay: UNCHANGED, CHANGED or ERROR."
+    value: ${{ steps.run.outputs.verdict }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Build eval-verdict
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci --no-audit --no-fund --loglevel=error
+    - id: run
+      name: Judge
+      shell: bash
+      env:
+        COMMAND: ${{ inputs.command }}
+        REPORTS: ${{ inputs.reports }}
+        CONFIG: ${{ inputs.config }}
+        BIN: ${{ github.action_path }}/dist/bin.js
+      run: |
+        # 입력은 env로만 받는다(스크립트에 직접 끼워 넣지 않는다). REPORTS는 glob 확장을 위해 따옴표 없이 쓴다.
+        set +e
+        node "$BIN" "$COMMAND" $REPORTS --config "$CONFIG"
+        code=$?
+        set -e
+        case "$COMMAND:$code" in
+          check:0) verdict=PASS ;;
+          check:1) verdict=FAIL ;;
+          replay:0) verdict=UNCHANGED ;;
+          replay:1) verdict=CHANGED ;;
+          *) verdict=ERROR ;;
+        esac
+        echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+        exit "$code"
