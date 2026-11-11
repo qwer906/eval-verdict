@@ -190,7 +190,10 @@ src/
   index.ts        라이브러리 export
 test/             node:test (CLI는 run(argv, io)를 직접 불러 exit code까지 확인)
 examples/         설정 하나, 결과 둘(PASS·ERROR)
-README.md
+scripts/smoke.mjs 빌드된 CLI를 예시 파일로 실제 실행해 exit code 확인
+docs/reference.md 설정 키, 결과 키, exit code, API
+.github/workflows/ci.yml
+README.md · AGENTS.md · LICENSE
 ```
 
 - 인자는 `node:util`의 `parseArgs`로 읽는다. 런타임 의존성은 두지 않는다.
