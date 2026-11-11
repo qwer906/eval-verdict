@@ -156,7 +156,11 @@ npx eval-verdict replay history/*.json  --config gate.config.json
 
 **판정이 그대로라는 확인**
 
-게이트 기록 파일에는 그때의 임계와 가드가 함께 남아 있다. 팀 레포에 기록 → (결과 파일, 설정 파일) 변환기를 두고, 기록마다 **그 기록 자신의 임계로** `check`를 돌려 기록된 판정과 모두 같은지 본다. 하나라도 다르면 연결하지 않는다. 그다음 지금 설정으로 `replay`를 돌려, 임계를 바꿔 온 이력이 몇 건을 뒤집었는지 따로 본다.
+게이트 기록 파일에는 그때의 임계와 가드가 함께 남아 있다. 팀 레포에 기록 → (결과 파일, 설정 파일) 변환기를 두고, 기록마다 **그 기록 자신의 임계로** `check`를 돌려 기록된 판정과 모두 같은지 본다. 하나라도 다르면 연결하지 않는다.
+
+결과(2026-11-11): 로컬에 남아 있던 기록 21건(10-28 ~ 11-06, PASS 16 · FAIL 1 · ERROR 4)이 모두 같은 판정, 같은 이유로 나왔다. 그 전 기록은 작업 폴더 정리로 지워져 검증하지 못했다.
+
+그다음 지금 설정으로 `replay`를 돌려, 임계를 바꿔 온 이력이 몇 건을 뒤집었는지 따로 본다.
 
 ## 7. 규칙의 근거
 
@@ -184,13 +188,9 @@ src/
   cli.ts          인자, 파일 읽기, exit code (run(argv, io) 로 테스트에서 직접 부른다)
   bin.ts          실행 진입점
   index.ts        라이브러리 export
-  adapters/       다른 도구의 결과 형식 (선택)
-test/             node:test
-examples/         설정·결과 예시 (PASS / FAIL / ERROR 각 하나)
-scripts/smoke.mjs 빌드된 CLI를 예시 파일로 실제 실행해 exit code 확인
-docs/reference.md 설정 키, 결과 키, exit code
-.github/workflows/ci.yml
-README.md · AGENTS.md · LICENSE
+test/             node:test (CLI는 run(argv, io)를 직접 불러 exit code까지 확인)
+examples/         설정 하나, 결과 둘(PASS·ERROR)
+README.md
 ```
 
 - 인자는 `node:util`의 `parseArgs`로 읽는다. 런타임 의존성은 두지 않는다.

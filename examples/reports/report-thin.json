@@ -1,0 +1,10 @@
+{
+  "model": "grader-model-a",
+  "verdict": "PASS",
+  "cases": [
+    { "id": "answer-accuracy", "trials": [95.0, null] },
+    { "id": "false-correct-pct", "trials": [0.0, 1.0] },
+    { "id": "unrelated-false-correct", "trials": [0] }
+  ],
+  "samples": { "graded-points": 120 }
+}
