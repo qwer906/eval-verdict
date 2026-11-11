@@ -2,13 +2,14 @@ import { appendFileSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { formatMarkdown, formatReplay, formatText } from "./format.ts";
 import { EXIT_CODE, judge } from "./judge.ts";
-import { parseConfig, parseReport } from "./parse.ts";
+import { isObject, parseConfig, parseReport } from "./parse.ts";
 import { replay } from "./replay.ts";
 import type { Parsed } from "./types.ts";
 
 export const HELP = `eval-verdict — turn repeated LLM eval results into one verdict
 
 Usage:
+  eval-verdict --version
   eval-verdict check  <report.json>     --config <config.json> [--json]
   eval-verdict replay <report.json>...  --config <config.json> [--json]
 
@@ -37,6 +38,7 @@ export function run(argv: readonly string[], io: Io): number {
         config: { type: "string" },
         json: { type: "boolean", default: false },
         help: { type: "boolean", short: "h", default: false },
+        version: { type: "boolean", short: "v", default: false },
       },
     });
   } catch (e) {
@@ -47,6 +49,10 @@ export function run(argv: readonly string[], io: Io): number {
 
   if (values.help) {
     io.out(HELP);
+    return 0;
+  }
+  if (values.version) {
+    io.out(`${VERSION}\n`);
     return 0;
   }
   if (command !== "check" && command !== "replay") return usage(io, command === undefined ? "missing command" : `unknown command "${command}"`);
@@ -108,5 +114,18 @@ function usage(io: Io, problem: string): number {
   io.err(`eval-verdict: ${problem}\n\n${HELP}`);
   return 2;
 }
+
+/** src/cli.ts 와 dist/cli.js 모두 한 단계 위에 package.json 이 있다. */
+function readVersion(): string {
+  try {
+    const pkg: unknown = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+    if (isObject(pkg) && typeof pkg.version === "string") return pkg.version;
+  } catch {
+    // 아래 기본값
+  }
+  return "unknown";
+}
+
+export const VERSION = readVersion();
 
 const errorMessage = (e: unknown): string => (e instanceof Error ? e.message : String(e));

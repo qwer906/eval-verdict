@@ -65,3 +65,10 @@ test("입력 오류는 전부 모아 exit 2 — 설정 오타도 오류다", () 
 test("임계 플래그는 없다", () => {
   assert.equal(call("check", good, "--config", config, "--min", "50").code, 2);
 });
+
+test("--version: package.json 의 버전", () => {
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string };
+  const r = call("--version");
+  assert.equal(r.code, 0);
+  assert.equal(r.out, `${pkg.version}\n`);
+});
