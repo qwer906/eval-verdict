@@ -2,6 +2,19 @@
   "name": "eval-verdict",
   "version": "0.1.0",
   "description": "Turn repeated LLM eval results into one merge-blocking verdict: PASS, FAIL, or ERROR.",
+  "keywords": [
+    "llm",
+    "eval",
+    "ci",
+    "gate",
+    "cli",
+    "typescript"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qwer906/eval-verdict.git"
+  },
   "type": "module",
   "bin": {
     "eval-verdict": "./dist/bin.js"
@@ -16,14 +29,16 @@
     "dist"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "node --experimental-strip-types --test \"test/**/*.test.ts\"",
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "ci": "npm run typecheck && npm run lint && npm test && npm run build"
+    "ci": "npm run typecheck && npm run lint && npm test && npm run build && npm run smoke",
+    "smoke": "node scripts/smoke.mjs",
+    "prepare": "npm run build"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

@@ -17,7 +17,7 @@ Exit codes:
   replay  0 no recorded verdict changes · 1 some would change · 2 bad input
 
 Thresholds live only in the config file, on purpose: a gate whose knobs
-change per run is not a gate. See docs/design.md.
+change per run is not a gate. See docs/reference.md.
 `;
 
 export interface Io {
